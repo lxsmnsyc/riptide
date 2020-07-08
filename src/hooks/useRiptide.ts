@@ -25,21 +25,15 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { Observable } from '../types';
-import useMemo from './useMemo';
 import useEffect from './useEffect';
 import useState from './useState';
+import { Riptide } from '../riptide';
 
-export default function useRiptide<R, D extends any[]>(
-  supplier: () => Observable<R>,
-  dependencies: D,
-): R | undefined {
-  const [state, setState] = useState<R | undefined>(undefined);
-
-  const observable = useMemo(supplier, dependencies);
+export default function useRiptide<T>(riptide: Riptide<T>): T | undefined {
+  const [state, setState] = useState<T | undefined>(undefined);
 
   useEffect(() => {
-    const subscription = observable.subscribe({
+    const subscription = riptide.subscribe({
       next(value) {
         setState(value);
       },
@@ -48,7 +42,7 @@ export default function useRiptide<R, D extends any[]>(
     return () => {
       subscription.cancel();
     };
-  }, [observable]);
+  }, [riptide]);
 
   return state;
 }
