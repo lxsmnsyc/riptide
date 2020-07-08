@@ -40,19 +40,19 @@ const HANDLER: MutableRefObject<Handler<any> | undefined> = {
   current: undefined,
 };
 
-export function getCurrentHandler<R>(): Handler<R> {
+export function getCurrentHandler<T>(): Handler<T> {
   if (!HANDLER.current) {
     throw new UnboundHookError();
   }
-  return HANDLER.current as Handler<R>;
+  return HANDLER.current as Handler<T>;
 }
 
-export default class Handler<R> implements Subscription {
-  private observer: Observer<R>;
+export default class Handler<T> implements Subscription {
+  private observer: Observer<T>;
 
-  private core: RiptideFunction<R>;
+  private core: RiptideFunction<T>;
 
-  constructor(core: RiptideFunction<R>, observer: Observer<R>) {
+  constructor(core: RiptideFunction<T>, observer: Observer<T>) {
     this.core = core;
     this.observer = observer;
   }
