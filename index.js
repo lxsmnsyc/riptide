@@ -17,13 +17,20 @@ const count = riptide(() => {
     };
   }, [state]);
 
-  return state;
+  return {
+    value: state,
+  };
 });
 
 const receiver = riptide(() => {
   const state = useRiptide(() => count, 0, []);
 
-  return `Next: ${state}`;
+  if (state && state % 2 === 0) {
+    return {
+      value: `Next: ${state}`,
+    };
+  }
+  return undefined;
 });
 
 receiver.subscribe({

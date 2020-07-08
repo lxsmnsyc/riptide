@@ -25,6 +25,15 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
+
+export interface Next<T> {
+  value: T;
+}
+
+export type RiptideResult<T> = Next<T> | undefined;
+
+export type RiptideFunction<T> = () => RiptideResult<T>;
+
 export interface MutableRefObject<T> {
   current: T;
 }

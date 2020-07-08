@@ -28,14 +28,13 @@
 import { Observable } from '../types';
 import useMemo from './useMemo';
 import useEffect from './useEffect';
-import useState, { State } from './useState';
+import useState from './useState';
 
 export default function useRiptide<R, D extends any[]>(
   supplier: () => Observable<R>,
-  initialState: State<R>,
   dependencies: D,
-): R {
-  const [state, setState] = useState(initialState);
+): R | undefined {
+  const [state, setState] = useState<R | undefined>(undefined);
 
   const observable = useMemo(supplier, dependencies);
 

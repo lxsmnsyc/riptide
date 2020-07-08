@@ -26,10 +26,10 @@
  * @copyright Alexis Munsayac 2020
  */
 import Handler from './core/handler';
-import { Observable } from './types';
+import { Observable, RiptideFunction } from './types';
 
 export default function riptide<R>(
-  core: () => R,
+  core: RiptideFunction<R>,
 ): Observable<R> {
   return {
     subscribe(observer) {

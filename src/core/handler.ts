@@ -25,7 +25,9 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { MutableRefObject, Observer, Subscription } from '../types';
+import {
+  MutableRefObject, Observer, Subscription, RiptideFunction,
+} from '../types';
 import HooksMismatchError from '../errors/hooks-mismatch';
 import UnboundHookError from '../errors/unbound-hook';
 
@@ -48,9 +50,9 @@ export function getCurrentHandler<R>(): Handler<R> {
 export default class Handler<R> implements Subscription {
   private observer: Observer<R>;
 
-  private core: () => R;
+  private core: RiptideFunction<R>;
 
-  constructor(core: () => R, observer: Observer<R>) {
+  constructor(core: RiptideFunction<R>, observer: Observer<R>) {
     this.core = core;
     this.observer = observer;
   }
@@ -166,7 +168,11 @@ export default class Handler<R> implements Subscription {
              * emit the value returned
              */
             this.running = true;
-            this.observer.next(this.core());
+
+            const result = this.core();
+            if (result) {
+              this.observer.next(result.value);
+            }
 
             /**
              * Run all side effects
