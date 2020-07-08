@@ -26,9 +26,12 @@
  * @copyright Alexis Munsayac 2020
  */
 export { default as useCallback } from './useCallback';
+export { default as useConstant } from './useConstant';
 export { default as useEffect } from './useEffect';
 export { default as useMemo } from './useMemo';
 export { default as useRiptide } from './useRiptide';
+export { default as useRiptideMapper } from './useRiptideMapper';
+export { default as useRiptideFilter } from './useRiptideFilter';
 export { default as useState } from './useState';
 
 export * from './useCallback';
