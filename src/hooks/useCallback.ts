@@ -34,7 +34,7 @@ export type Memo<R> = () => R;
 type CallbackSlot = 'CALLBACK';
 type CallbackDependencySlot = 'CALLBACK_DEPENDENCY';
 
-export default function useMemo<R extends((...args: any) => any), D extends any[]>(
+export default function useCallback<R extends((...args: any) => any), D extends any[]>(
   callback: R,
   dependencies: D): R {
   const handler = getCurrentHandler();
