@@ -26,16 +26,24 @@
  * @copyright Alexis Munsayac 2020
  */
 import Handler from './core/handler';
-import { Observable, RiptideFunction } from './types';
+import { Observable, RiptideFunction, Observer } from './types';
 
-export default function riptide<R>(
-  core: RiptideFunction<R>,
-): Observable<R> {
-  return {
-    subscribe(observer) {
-      const handler = new Handler(core, observer);
-      handler.run();
-      return handler;
-    },
-  };
+export class Riptide<T> implements Observable<T> {
+  private core: RiptideFunction<T>;
+
+  constructor(core: RiptideFunction<T>) {
+    this.core = core;
+  }
+
+  subscribe(observer: Observer<T>): Handler<T> {
+    const handler = new Handler(this.core, observer);
+    handler.run();
+    return handler;
+  }
+}
+
+export default function riptide<T>(
+  core: RiptideFunction<T>,
+): Riptide<T> {
+  return new Riptide<T>(core);
 }
