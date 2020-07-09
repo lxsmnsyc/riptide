@@ -25,25 +25,33 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import Handler from './core/handler';
-import { Observable, RiptideFunction, Observer } from './types';
+import { RiptideObservable, RiptideObserver, RiptideSubscription } from './types';
+import { RiptideProcessor } from './riptide-processor';
 
-export class Riptide<T> implements Observable<T> {
-  private core: RiptideFunction<T>;
+export class RiptideValue<T> implements RiptideObservable<T> {
+  private processor = new RiptideProcessor<T>();
 
-  constructor(core: RiptideFunction<T>) {
-    this.core = core;
+  private internalValue: T;
+
+  constructor(initialValue: T) {
+    this.internalValue = initialValue;
   }
 
-  subscribe(observer: Observer<T>): Handler<T> {
-    const handler = new Handler(this.core, observer);
-    handler.run();
-    return handler;
+  get value(): T {
+    return this.internalValue;
+  }
+
+  set value(value: T) {
+    this.internalValue = value;
+
+    this.processor.next(value);
+  }
+
+  subscribe(observer: RiptideObserver<T>): RiptideSubscription {
+    return this.processor.subscribe(observer);
   }
 }
 
-export default function riptide<T>(
-  core: RiptideFunction<T>,
-): Riptide<T> {
-  return new Riptide<T>(core);
+export default function riptideValue<R>(initialValue: R): RiptideValue<R> {
+  return new RiptideValue<R>(initialValue);
 }

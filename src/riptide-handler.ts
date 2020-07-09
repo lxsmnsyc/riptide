@@ -26,33 +26,33 @@
  * @copyright Alexis Munsayac 2020
  */
 import {
-  MutableRefObject, Observer, Subscription, RiptideFunction,
-} from '../types';
-import HooksMismatchError from '../errors/hooks-mismatch';
-import UnboundHookError from '../errors/unbound-hook';
+  MutableRefObject, RiptideFunction, RiptideObserver, RiptideSubscription,
+} from './types';
+import HooksMismatchError from './errors/hooks-mismatch';
+import UnboundHookError from './errors/unbound-hook';
 
 export interface Slot<K extends string, V> {
   key: K;
   value: V;
 }
 
-const HANDLER: MutableRefObject<Handler<any> | undefined> = {
+const HANDLER: MutableRefObject<RiptideHandler<any> | undefined> = {
   current: undefined,
 };
 
-export function getCurrentHandler<T>(): Handler<T> {
+export function getCurrentHandler<T>(): RiptideHandler<T> {
   if (!HANDLER.current) {
     throw new UnboundHookError();
   }
-  return HANDLER.current as Handler<T>;
+  return HANDLER.current as RiptideHandler<T>;
 }
 
-export default class Handler<T> implements Subscription {
-  private observer: Observer<T>;
+export default class RiptideHandler<T> implements RiptideSubscription {
+  private observer: RiptideObserver<T>;
 
   private core: RiptideFunction<T>;
 
-  constructor(core: RiptideFunction<T>, observer: Observer<T>) {
+  constructor(core: RiptideFunction<T>, observer: RiptideObserver<T>) {
     this.core = core;
     this.observer = observer;
   }
