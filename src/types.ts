@@ -38,15 +38,15 @@ export interface MutableRefObject<T> {
   current: T;
 }
 
-export interface Subscription {
+export interface RiptideSubscription {
   cancel(): void;
 }
 
-export interface Observer<T> {
+export interface RiptideObserver<T> {
   next(value: T): void;
   error?(value: Error): void;
 }
 
-export interface Observable<T> {
-  subscribe(observer: Observer<T>): Subscription;
+export interface RiptideObservable<T> {
+  subscribe(observer: RiptideObserver<T>): RiptideSubscription;
 }
