@@ -27,18 +27,20 @@
  */
 import useEffect from './useEffect';
 import useState from './useState';
-import { Riptide } from '../riptide';
+import { RiptideObservable, MutableRefObject } from '../types';
 
 export default function useRiptideFilter<T>(
-  riptide: Riptide<T>,
+  riptide: RiptideObservable<T>,
   filter: (value: T) => boolean,
 ): T | undefined {
-  const [state, setState] = useState<T | undefined>(undefined);
+  const [state, setState] = useState<MutableRefObject<T | undefined>>({
+    current: undefined,
+  });
 
   useEffect(() => {
     const subscription = riptide.subscribe({
       next(value) {
-        setState((current) => (filter(value) ? value : current));
+        setState((current) => (filter(value) ? { current: value } : current));
       },
     });
 
@@ -47,5 +49,5 @@ export default function useRiptideFilter<T>(
     };
   }, [riptide, filter]);
 
-  return state;
+  return state.current;
 }

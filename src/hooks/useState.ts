@@ -26,7 +26,7 @@
  * @copyright Alexis Munsayac 2020
  */
 
-import { getCurrentHandler } from '../core/handler';
+import { getCurrentHandler } from '../riptide-handler';
 
 type StateSupplier<T> = () => T
 export type State<T> = T | StateSupplier<T>;

@@ -27,25 +27,27 @@
  */
 import useEffect from './useEffect';
 import useState from './useState';
-import { Riptide } from '../riptide';
+import { RiptideObservable, MutableRefObject } from '../types';
 
 export default function useRiptideMapper<T, R>(
-  riptide: Riptide<T>,
-  selector: (value: T) => R,
+  riptide: RiptideObservable<T>,
+  mapper: (value: T) => R,
 ): R | undefined {
-  const [state, setState] = useState<R | undefined>(undefined);
+  const [state, setState] = useState<MutableRefObject<R | undefined>>({
+    current: undefined,
+  });
 
   useEffect(() => {
     const subscription = riptide.subscribe({
       next(value) {
-        setState(() => selector(value));
+        setState(() => ({ current: mapper(value) }));
       },
     });
 
     return () => {
       subscription.cancel();
     };
-  }, [riptide, selector]);
+  }, [riptide, mapper]);
 
-  return state;
+  return state.current;
 }

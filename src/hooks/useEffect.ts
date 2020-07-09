@@ -26,7 +26,7 @@
  * @copyright Alexis Munsayac 2020
  */
 
-import { getCurrentHandler } from '../core/handler';
+import { getCurrentHandler } from '../riptide-handler';
 import listNotEqual from '../utils/list-not-equal';
 
 export type EffectCleanup = (() => void) | undefined;

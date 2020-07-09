@@ -25,20 +25,41 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { getCurrentHandler } from '../riptide-handler';
-import { MutableRefObject } from '../types';
+import useEffect from './useEffect';
+import useState from './useState';
+import { RiptideObservable, MutableRefObject } from '../types';
 
-type RefSlot = 'REF';
+export default function useRiptideThrottle<T>(
+  riptide: RiptideObservable<T>,
+  cooldown: number,
+): T | undefined {
+  const [state, setState] = useState<MutableRefObject<T | undefined>>({
+    current: undefined,
+  });
 
-export default function useRef<R>(initialValue: R): MutableRefObject<R> {
-  const handler = getCurrentHandler();
+  useEffect(() => {
+    let current: ReturnType<typeof setTimeout> | undefined;
 
-  const result = handler.createSlot<RefSlot, MutableRefObject<R>>(
-    'REF',
-    () => ({
-      current: initialValue,
-    }),
-  );
+    const subscription = riptide.subscribe({
+      next(value) {
+        if (!current) {
+          setState({
+            current: value,
+          });
+          current = setTimeout(() => {
+            current = undefined;
+          }, cooldown);
+        }
+      },
+    });
 
-  return result.value;
+    return () => {
+      if (current) {
+        clearTimeout(current);
+      }
+      subscription.cancel();
+    };
+  }, [riptide, cooldown]);
+
+  return state.current;
 }
