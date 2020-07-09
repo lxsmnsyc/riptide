@@ -25,5 +25,8 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-export { default as riptide } from './riptide';
+export { default as createColdRiptide } from './cold-riptide';
+export { default as createHotRiptide } from './hot-riptide';
+export { default as createRiptideProcessor } from './riptide-processor';
+export { default as createRiptideValue } from './riptide-value';
 export * from './hooks';
