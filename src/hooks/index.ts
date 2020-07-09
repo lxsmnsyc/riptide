@@ -30,8 +30,10 @@ export { default as useConstant } from './useConstant';
 export { default as useEffect } from './useEffect';
 export { default as useMemo } from './useMemo';
 export { default as useRiptide } from './useRiptide';
-export { default as useRiptideMapper } from './useRiptideMapper';
+export { default as useRiptideDebounce } from './useRiptideDebounce';
 export { default as useRiptideFilter } from './useRiptideFilter';
+export { default as useRiptideMapper } from './useRiptideMapper';
+export { default as useRiptideThrottle } from './useRiptideThrottle';
 export { default as useState } from './useState';
 
 export * from './useCallback';
