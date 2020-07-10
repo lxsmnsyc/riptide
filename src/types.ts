@@ -27,10 +27,16 @@
  */
 
 export interface Next<T> {
+  type: 'next',
   value: T;
 }
 
-export type RiptideResult<T> = Next<T> | undefined;
+export interface Complete {
+  type: 'complete',
+  value?: undefined,
+}
+
+export type RiptideResult<T> = Next<T> | Complete | undefined;
 
 export type RiptideFunction<T> = () => RiptideResult<T>;
 
@@ -45,6 +51,7 @@ export interface RiptideSubscription {
 export interface RiptideObserver<T> {
   next(value: T): void;
   error?(value: Error): void;
+  complete?(): void;
 }
 
 export interface RiptideObservable<T> {
