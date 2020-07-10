@@ -25,21 +25,21 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import useEffect from './useEffect';
+import useDeferEffect from './useDeferEffect';
 import useState from './useState';
-import { RiptideObservable, MutableRefObject } from '../types';
+import { RiptideObservable, RiptideResult } from '../types';
+import { next, complete } from '../signal';
 
-export default function useRiptide<T>(riptide: RiptideObservable<T>): T | undefined {
-  const [state, setState] = useState<MutableRefObject<T | undefined>>({
-    current: undefined,
-  });
+export default function useRiptide<T>(riptide: RiptideObservable<T>): RiptideResult<T> {
+  const [state, setState] = useState<RiptideResult<T>>(undefined);
 
-  useEffect(() => {
+  useDeferEffect(() => {
     const subscription = riptide.subscribe({
       next(value) {
-        setState({
-          current: value,
-        });
+        setState(next(value));
+      },
+      complete() {
+        setState(complete());
       },
     });
 
@@ -48,5 +48,5 @@ export default function useRiptide<T>(riptide: RiptideObservable<T>): T | undefi
     };
   }, [riptide]);
 
-  return state.current;
+  return state;
 }
