@@ -30,3 +30,4 @@ export { default as createHotRiptide } from './hot-riptide';
 export { default as createRiptideProcessor } from './riptide-processor';
 export { default as createRiptideValue } from './riptide-value';
 export * from './hooks';
+export * from './signal';
