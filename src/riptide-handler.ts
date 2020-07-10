@@ -120,6 +120,20 @@ export default class RiptideHandler<T> implements RiptideSubscription {
     }
   }
 
+  private deferEffects: (() => void)[] = [];
+
+  resetDeferEffects(): void {
+    this.deferEffects = [];
+  }
+
+  registerDeferEffect(effect: () => void): void {
+    if (this.running) {
+      this.deferEffects.push(effect);
+    } else {
+      effect();
+    }
+  }
+
   scheduleUpdate(): void {
     if (this.running) {
       this.updateScheduled = true;
@@ -132,74 +146,92 @@ export default class RiptideHandler<T> implements RiptideSubscription {
     try {
       if (this.observer.error) {
         this.observer.error(error);
+      } else {
+        throw error;
       }
     } finally {
       this.cancel();
     }
   }
 
-  private debouncedRun = false;
-
   run(): void {
     if (this.alive) {
-      if (this.debouncedRun) {
-        return;
+      this.updateScheduled = false;
+
+      HANDLER.current = this;
+      try {
+        /**
+         * Reset the handler
+         */
+        this.resetEffects();
+        this.resetDeferEffects();
+        this.resetCursor();
+
+        /**
+         * Run the core function and
+         * emit the value returned
+         */
+        this.running = true;
+        const result = this.core();
+
+        let performCancel = false;
+        /**
+         * Run all deferred effects
+         */
+        for (let i = 0; i < this.deferEffects.length; i += 1) {
+          this.deferEffects[i]();
+        }
+
+        switch (result?.type) {
+          case 'complete':
+            if (this.observer.complete) {
+              this.observer.complete();
+            }
+            /**
+             * No further updates shall be made.
+             */
+            this.updateScheduled = false;
+            /**
+             * Cancel after effects has been commited.
+             */
+            performCancel = true;
+            break;
+          case 'next':
+            this.observer.next(result.value);
+            break;
+          default:
+            break;
+        }
+
+        /**
+         * Run all side effects
+         */
+        for (let i = 0; i < this.effects.length; i += 1) {
+          this.effects[i]();
+        }
+        this.running = false;
+
+        /**
+         * Cancel the observer
+         */
+        if (performCancel) {
+          this.cancel();
+        }
+
+        /**
+         * If an update is scheduled, re-run
+         */
+        if (this.updateScheduled) {
+          this.run();
+        }
+      } catch (error) {
+        /**
+         * Something went wrong, emit an error
+         * and cancel the handler
+         */
+        this.dispose(error);
       }
-      this.debouncedRun = true;
-
-      Promise.resolve()
-        .then(() => {
-          if (!this.alive) {
-            return;
-          }
-          this.updateScheduled = false;
-          this.debouncedRun = false;
-
-          HANDLER.current = this;
-          try {
-            /**
-             * Reset the handler
-             */
-            this.resetEffects();
-            this.resetCursor();
-
-            /**
-             * Run the core function and
-             * emit the value returned
-             */
-            this.running = true;
-
-            const result = this.core();
-            if (result) {
-              this.observer.next(result.value);
-            }
-
-            /**
-             * Run all side effects
-             */
-            for (let i = 0; i < this.effects.length; i += 1) {
-              this.effects[i]();
-            }
-            this.running = false;
-
-            /**
-             * If an update is scheduled, re-run
-             */
-            if (this.updateScheduled) {
-              this.run();
-            }
-          } catch (error) {
-            /**
-             * Something went wrong, emit an error
-             * and cancel the handler
-             */
-            this.dispose(error);
-          }
-          HANDLER.current = undefined;
-        })
-        .catch((error) => {
-          this.dispose(error);
-        });
+      HANDLER.current = undefined;
     }
   }
 
