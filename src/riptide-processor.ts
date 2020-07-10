@@ -44,6 +44,14 @@ export class RiptideProcessor<T> implements RiptideObservable<T>, RiptideObserve
     });
   }
 
+  complete(): void {
+    this.observers.forEach((observer) => {
+      if (observer.complete) {
+        observer.complete();
+      }
+    });
+  }
+
   subscribe(observer: RiptideObserver<T>): RiptideSubscription {
     const { observers } = this;
     observers.add(observer);
