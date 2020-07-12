@@ -2,10 +2,8 @@
 export default function useRiptideDebounce<T>(
   riptide: RiptideObservable<T>,
   cooldown: number,
-): T | undefined {
-  const [state, setState] = useState<MutableRefObject<T | undefined>>({
-    current: undefined,
-  });
+): RiptideResult<T> {
+  const [state, setState] = useState<RiptideResult<T>>(undefined);
 
   useEffect(() => {
     let current: ReturnType<typeof setTimeout> | undefined;
@@ -16,11 +14,12 @@ export default function useRiptideDebounce<T>(
           clearTimeout(current);
         }
         current = setTimeout(() => {
-          setState({
-            current: value,
-          });
+          setState(next(value));
           current = undefined;
         }, cooldown);
+      },
+      complete() {
+        setState(complete());
       },
     });
 
@@ -32,6 +31,6 @@ export default function useRiptideDebounce<T>(
     };
   }, [riptide, cooldown]);
 
-  return state.current;
+  return state;
 }
 ```

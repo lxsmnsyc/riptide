@@ -1,33 +1,30 @@
 ```ts
-export default function useRiptideThrottle<T>(
+export default function useRiptideDelay<T>(
   riptide: RiptideObservable<T>,
   cooldown: number,
 ): RiptideResult<T> {
   const [state, setState] = useState<RiptideResult<T>>(undefined);
 
   useEffect(() => {
-    let current: ReturnType<typeof setTimeout> | undefined;
+    const current: ReturnType<typeof setTimeout>[] = [];
+
     const subscription = riptide.subscribe({
       next(value) {
-        if (!current) {
+        current.push(setTimeout(() => {
           setState(next(value));
-          current = setTimeout(() => {
-            current = undefined;
-          }, cooldown);
-        }
+        }, cooldown));
       },
       complete() {
-        if (current) {
-          clearTimeout(current);
-        }
-        setState(complete());
+        current.push(setTimeout(() => {
+          setState(complete());
+        }, cooldown));
       },
     });
 
     return () => {
-      if (current) {
-        clearTimeout(current);
-      }
+      current.forEach((timeout) => {
+        clearTimeout(timeout);
+      });
       subscription.cancel();
     };
   }, [riptide, cooldown]);

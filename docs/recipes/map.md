@@ -3,15 +3,16 @@
 export default function useRiptideMap<T, R>(
   riptide: RiptideObservable<T>,
   mapper: (value: T) => R,
-): R | undefined {
-  const [state, setState] = useState<MutableRefObject<R | undefined>>({
-    current: undefined,
-  });
+): RiptideResult<R> {
+  const [state, setState] = useState<RiptideResult<R>>(undefined);
 
   useEffect(() => {
     const subscription = riptide.subscribe({
       next(value) {
-        setState(() => ({ current: mapper(value) }));
+        setState(next(mapper(value)));
+      },
+      complete() {
+        setState(complete());
       },
     });
 
@@ -20,6 +21,6 @@ export default function useRiptideMap<T, R>(
     };
   }, [riptide, mapper]);
 
-  return state.current;
+  return state;
 }
 ```
