@@ -1,6 +1,6 @@
 ```ts
 export default function useRiptideFilter<T>(
-  riptide: RiptideObservable<T>,
+  riptide: RiptidePublisher<T>,
   filter: (value: T) => boolean,
 ): RiptideResult<T> {
   const [state, setState] = useState<RiptideResult<T>>(undefined);

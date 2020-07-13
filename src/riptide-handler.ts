@@ -26,7 +26,7 @@
  * @copyright Alexis Munsayac 2020
  */
 import {
-  MutableRefObject, RiptideFunction, RiptideObserver, RiptideSubscription,
+  MutableRefObject, RiptideFunction, RiptideSubscriber, RiptideSubscription,
 } from './types';
 import HooksMismatchError from './errors/hooks-mismatch';
 import UnboundHookError from './errors/unbound-hook';
@@ -48,13 +48,13 @@ export function getCurrentHandler<T>(): RiptideHandler<T> {
 }
 
 export default class RiptideHandler<T> implements RiptideSubscription {
-  private observer: RiptideObserver<T>;
+  private subscriber: RiptideSubscriber<T>;
 
   private core: RiptideFunction<T>;
 
-  constructor(core: RiptideFunction<T>, observer: RiptideObserver<T>) {
+  constructor(core: RiptideFunction<T>, subscriber: RiptideSubscriber<T>) {
     this.core = core;
-    this.observer = observer;
+    this.subscriber = subscriber;
   }
 
   private cursor = 0;
@@ -144,8 +144,8 @@ export default class RiptideHandler<T> implements RiptideSubscription {
 
   private dispose(error: Error): void {
     try {
-      if (this.observer.error) {
-        this.observer.error(error);
+      if (this.subscriber.error) {
+        this.subscriber.error(error);
       } else {
         throw error;
       }
@@ -184,8 +184,8 @@ export default class RiptideHandler<T> implements RiptideSubscription {
 
         switch (result?.type) {
           case 'complete':
-            if (this.observer.complete) {
-              this.observer.complete();
+            if (this.subscriber.complete) {
+              this.subscriber.complete();
             }
             /**
              * No further updates shall be made.
@@ -197,7 +197,7 @@ export default class RiptideHandler<T> implements RiptideSubscription {
             performCancel = true;
             break;
           case 'next':
-            this.observer.next(result.value);
+            this.subscriber.next(result.value);
             break;
           default:
             break;
@@ -212,7 +212,7 @@ export default class RiptideHandler<T> implements RiptideSubscription {
         this.running = false;
 
         /**
-         * Cancel the observer
+         * Cancel the subscriber
          */
         if (performCancel) {
           this.cancel();

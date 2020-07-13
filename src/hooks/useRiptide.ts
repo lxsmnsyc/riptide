@@ -25,15 +25,15 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import useDeferEffect from './useDeferEffect';
+import useEffect from './useEffect';
 import useState from './useState';
-import { RiptideObservable, RiptideResult } from '../types';
+import { RiptidePublisher, RiptideResult } from '../types';
 import { next, complete } from '../signal';
 
-export default function useRiptide<T>(riptide: RiptideObservable<T>): RiptideResult<T> {
+export default function useRiptide<T>(riptide: RiptidePublisher<T>): RiptideResult<T> {
   const [state, setState] = useState<RiptideResult<T>>(undefined);
 
-  useDeferEffect(() => {
+  useEffect(() => {
     const subscription = riptide.subscribe({
       next(value) {
         setState(next(value));

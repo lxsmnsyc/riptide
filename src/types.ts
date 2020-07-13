@@ -48,12 +48,12 @@ export interface RiptideSubscription {
   cancel(): void;
 }
 
-export interface RiptideObserver<T> {
+export interface RiptideSubscriber<T> {
   next(value: T): void;
   error?(value: Error): void;
   complete?(): void;
 }
 
-export interface RiptideObservable<T> {
-  subscribe(observer: RiptideObserver<T>): RiptideSubscription;
+export interface RiptidePublisher<T> {
+  subscribe(subscriber: RiptideSubscriber<T>): RiptideSubscription;
 }

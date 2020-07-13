@@ -25,10 +25,10 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { RiptideObservable, RiptideObserver, RiptideSubscription } from './types';
+import { RiptidePublisher, RiptideSubscriber, RiptideSubscription } from './types';
 import { RiptideProcessor } from './riptide-processor';
 
-export class RiptideValue<T> implements RiptideObservable<T> {
+export class RiptideValue<T> implements RiptidePublisher<T> {
   private processor = new RiptideProcessor<T>();
 
   private internalValue: T;
@@ -47,8 +47,8 @@ export class RiptideValue<T> implements RiptideObservable<T> {
     this.processor.next(value);
   }
 
-  subscribe(observer: RiptideObserver<T>): RiptideSubscription {
-    return this.processor.subscribe(observer);
+  subscribe(subscriber: RiptideSubscriber<T>): RiptideSubscription {
+    return this.processor.subscribe(subscriber);
   }
 }
 

@@ -1,6 +1,6 @@
 ```ts
 export default function useRiptideThrottle<T>(
-  riptide: RiptideObservable<T>,
+  riptide: RiptidePublisher<T>,
   cooldown: number,
 ): RiptideResult<T> {
   const [state, setState] = useState<RiptideResult<T>>(undefined);

@@ -1,7 +1,7 @@
 
 ```ts
 export default function useRiptideMap<T, R>(
-  riptide: RiptideObservable<T>,
+  riptide: RiptidePublisher<T>,
   mapper: (value: T) => R,
 ): RiptideResult<R> {
   const [state, setState] = useState<RiptideResult<R>>(undefined);

@@ -25,18 +25,18 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { RiptideFunction, RiptideObservable, RiptideObserver } from './types';
+import { RiptideFunction, RiptidePublisher, RiptideSubscriber } from './types';
 import RiptideHandler from './riptide-handler';
 
-export class ColdRiptide<T> implements RiptideObservable<T> {
+export class ColdRiptide<T> implements RiptidePublisher<T> {
   private core: RiptideFunction<T>;
 
   constructor(core: RiptideFunction<T>) {
     this.core = core;
   }
 
-  subscribe(observer: RiptideObserver<T>): RiptideHandler<T> {
-    const handler = new RiptideHandler(this.core, observer);
+  subscribe(subscriber: RiptideSubscriber<T>): RiptideHandler<T> {
+    const handler = new RiptideHandler(this.core, subscriber);
     handler.run();
     return handler;
   }
