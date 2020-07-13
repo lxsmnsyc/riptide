@@ -25,40 +25,52 @@
  * @author Alexis Munsayac <alexis.munsayac@gmail.com>
  * @copyright Alexis Munsayac 2020
  */
-import { RiptideObservable, RiptideObserver, RiptideSubscription } from './types';
+import { RiptidePublisher, RiptideSubscriber, RiptideSubscription } from './types';
 
-export class RiptideProcessor<T> implements RiptideObservable<T>, RiptideObserver<T> {
-  private observers = new Set<RiptideObserver<T>>();
+export class RiptideProcessor<T> implements RiptidePublisher<T>, RiptideSubscriber<T> {
+  private subscribers = new Set<RiptideSubscriber<T>>();
+
+  private alive = true;
 
   next(value: T): void {
-    this.observers.forEach((observer) => {
-      observer.next(value);
-    });
+    if (this.alive) {
+      this.subscribers.forEach((subscriber) => {
+        subscriber.next(value);
+      });
+    }
   }
 
   error(value: Error): void {
-    this.observers.forEach((observer) => {
-      if (observer.error) {
-        observer.error(value);
-      }
-    });
+    if (this.alive) {
+      this.alive = false;
+      this.subscribers.forEach((subscriber) => {
+        if (subscriber.error) {
+          subscriber.error(value);
+        }
+      });
+    } else {
+      throw value;
+    }
   }
 
   complete(): void {
-    this.observers.forEach((observer) => {
-      if (observer.complete) {
-        observer.complete();
-      }
-    });
+    if (this.alive) {
+      this.alive = false;
+      this.subscribers.forEach((subscriber) => {
+        if (subscriber.complete) {
+          subscriber.complete();
+        }
+      });
+    }
   }
 
-  subscribe(observer: RiptideObserver<T>): RiptideSubscription {
-    const { observers } = this;
-    observers.add(observer);
+  subscribe(subscriber: RiptideSubscriber<T>): RiptideSubscription {
+    const { subscribers } = this;
+    subscribers.add(subscriber);
 
     return {
       cancel() {
-        observers.delete(observer);
+        subscribers.delete(subscriber);
       },
     };
   }
