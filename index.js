@@ -1,43 +1,25 @@
-const { riptide, useState, useEffect, useRiptide } = require('./dist');
+const riptide = require('./dist');
 
-const count = riptide(() => {
-  const [state, setState] = useState(1);
+const counter = riptide.createColdRiptide(() => {
+  const [state, setState] = riptide.useState(0);
 
-  useEffect(() => {
-    if (state >= 10) {
-      return undefined;
-    }
-
-    const timeout = setTimeout(() => {
-      setState(state + 1);
-    }, 1000);
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [state]);
-
-  return {
-    value: state,
-  };
-});
-
-const receiver = riptide(() => {
-  const state = useRiptide(() => count, 0, []);
-
-  if (state && state % 2 === 0) {
-    return {
-      value: `Next: ${state}`,
-    };
+  if (state > 10) {
+    return riptide.complete();
   }
-  return undefined;
+
+  setState(state + 1);
+
+  return riptide.next(state);
 });
 
-receiver.subscribe({
+counter.subscribe({
   next(value) {
-    console.log(value);
+    console.log(`Received: ${value}`);
   },
   error(value) {
-    console.error(value);
+    console.log(value);
+  },
+  complete() {
+    console.log(`Counter completed!`);
   },
 });
